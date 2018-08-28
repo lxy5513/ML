@@ -331,7 +331,7 @@ class DeepEmbeddingClustering(object):
             # update (or initialize) probability distributions and propagate weight changes
             # from DEC model to encoder.
             # 输出条件
-            if iteration % update_interval == 0:
+            if iteration/3 % update_interval == 0:
 
                 self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
                 self.p = self.p_mat(self.q)
@@ -341,8 +341,8 @@ class DeepEmbeddingClustering(object):
                 # 什么东西
 
                 # --------------------------3
-                print('y_pred and self.y_pred', y_pred, '\n\n', self.y_pred)
-                time.sleep(2)
+                print('y_pred and self.y_pred:\n', y_pred, '\n', self.y_pred)
+
 
                 delta_label = ((y_pred == self.y_pred).sum().astype(np.float32) / y_pred.shape[0])
 
@@ -357,6 +357,8 @@ class DeepEmbeddingClustering(object):
                 # 循环终止条件！
                 print('循环终止条件==========     delta_label < tol')
                 print('delta_label is     {} \ntol is                {}'.format(delta_label, tol))
+                # -------------------------------------------------------------------------------------
+                import pdb;pdb.set_trace()
                 if delta_label < tol:
                     print('Reached tolerance threshold. Stopping training.')
                     train = False
