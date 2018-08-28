@@ -130,6 +130,7 @@ class DeepEmbeddingClustering(object):
 
         # greedy layer-wise training before end-to-end training:
 
+        print('\n\ninput_dim is ', self.input_dim)
         self.encoders_dims = [self.input_dim, 500, 500, 2000, 10]
 
         self.input_layer = Input(shape=(self.input_dim,), name='input')
