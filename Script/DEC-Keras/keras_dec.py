@@ -259,12 +259,13 @@ class DeepEmbeddingClustering(object):
             self.encoder.layers[i].set_weights(self.autoencoder.layers[i].get_weights())
 
         # initialize cluster centres using k-means
-        print('\n\nInitializing cluster centres with k-means.\n\n')
+        print('\n\nInitializing cluster centres with k-means.\n')
         if self.cluster_centres is None:
             kmeans = KMeans(n_clusters=self.n_clusters, n_init=20)
             self.y_pred = kmeans.fit_predict(self.encoder.predict(X))
             self.cluster_centres = kmeans.cluster_centers_
 
+        print('分成的类数： ', self.cluster_centres)
         # prepare DEC model
         #self.DEC = Model(inputs=self.input_layer,
         #                 outputs=ClusteringLayer(self.n_clusters,
@@ -324,10 +325,8 @@ class DeepEmbeddingClustering(object):
 
             # update (or initialize) probability distributions and propagate weight changes
             # from DEC model to encoder.
-            #
+            # 输出条件
             if iteration % update_interval == 0:
-                print('终止条件 iteration % update_interval == 0')
-                print('iteration is {} update_interval is {}'.format(iteration, update_interval))
 
                 self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
                 self.p = self.p_mat(self.q)
@@ -344,6 +343,8 @@ class DeepEmbeddingClustering(object):
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
 
                 # 循环终止条件！
+                print('循环终止条件=====================delta_label < tol')
+                print('delta_label is     {} tol is                {}'.format(delta_label, tol))
                 if delta_label < tol:
                     print('Reached tolerance threshold. Stopping training.')
                     train = False
