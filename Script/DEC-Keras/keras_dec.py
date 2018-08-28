@@ -333,10 +333,10 @@ class DeepEmbeddingClustering(object):
             # 输出条件
             if iteration/3 % update_interval == 0:
 
-                self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
+                self.q = self.DEC.predict(X, verbose=0)                  #=================== 预测！！
                 self.p = self.p_mat(self.q)
 
-                # 什么东西
+                # 什么东西   ===============预测数据 分10类
                 y_pred = self.q.argmax(1)
                 # 什么东西
 
@@ -355,12 +355,12 @@ class DeepEmbeddingClustering(object):
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
 
                 # 循环终止条件！
-                print('循环终止条件==========     delta_label < tol')
+                print('循环终止条件  ==========     delta_label < tol')
                 print('delta_label is     {} \ntol is                {}'.format(delta_label, tol))
                 # -------------------------------------------------------------------------------------
                 import pdb;pdb.set_trace()
                 if delta_label < tol:
-                    print('Reached tolerance threshold. Stopping training.')
+                    print('达到容差阈值。 停止训练 Reached tolerance threshold. Stopping training.')
                     train = False
                     continue
                 else:
@@ -388,10 +388,10 @@ class DeepEmbeddingClustering(object):
                 pca = PCA(n_components=2).fit(z)
                 z_2d = pca.transform(z)
                 clust_2d = pca.transform(self.cluster_centres)
-                # save states for visualization
+                # save states for visualization========================
                 pickle.dump({'z_2d': z_2d, 'clust_2d': clust_2d, 'q': self.q, 'p': self.p},
                             open('c'+str(iteration)+'.pkl', 'wb'))
-                # save DEC model checkpoints
+                # save DEC model checkpoints======================
                 self.DEC.save('DEC_model_'+str(iteration)+'.h5')
 
             iteration += 1
