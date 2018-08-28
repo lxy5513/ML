@@ -192,6 +192,10 @@ class DeepEmbeddingClustering(object):
 
             iters_per_epoch = int(len(X) / self.batch_size)
             layerwise_epochs = max(int(layerwise_pretrain_iters / iters_per_epoch), 1)
+
+            # too long !!!
+            layerwise_epochs = 18
+
             finetune_epochs = max(int(finetune_iters / iters_per_epoch), 1)
 
             print('前-训练 分层 layerwise pretrain')
