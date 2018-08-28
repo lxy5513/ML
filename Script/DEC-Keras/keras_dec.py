@@ -16,6 +16,23 @@ from keras.callbacks import LearningRateScheduler
 from sklearn.utils.linear_assignment_ import linear_assignment
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+
+import time
+
+
+start_time = 0
+def consume_time():
+    end_time = time.time()
+    interval = end_time - start_time
+    seconds = interval
+    if seconds > 60:
+        minutes = int(seconds/60)
+        seconds = seconds % 60
+        seconds = round(seconds, 2)
+        print("目前耗时 {} 分 {} 秒".format(minutes, seconds))
+    else:
+        print("目前耗时 {} 秒".format(round(seconds, 2)))
+
 if (sys.version[0] == 2):
     import cPickle as pickle
 else:
@@ -204,6 +221,7 @@ class DeepEmbeddingClustering(object):
                 self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
                 self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
 
+            consume_time()
             print('Finetuning autoencoder')
 
             #update encoder and decoder weights:
@@ -239,6 +257,7 @@ class DeepEmbeddingClustering(object):
         self.DEC.compile(loss='kullback_leibler_divergence', optimizer='adadelta')
         return
 
+
     def cluster_acc(self, y_true, y_pred):
         assert y_pred.size == y_true.size
         D = max(y_pred.max(), y_true.max())+1
@@ -247,6 +266,7 @@ class DeepEmbeddingClustering(object):
             w[y_pred[i], y_true[i]] += 1
         ind = linear_assignment(w.max() - w)
         return sum([w[i, j] for i, j in ind])*1.0/y_pred.size, w
+
 
     def cluster(self, X, y=None,
                 tol=0.01, update_interval=None,
