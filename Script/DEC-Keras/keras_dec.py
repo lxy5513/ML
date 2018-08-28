@@ -324,12 +324,18 @@ class DeepEmbeddingClustering(object):
 
             # update (or initialize) probability distributions and propagate weight changes
             # from DEC model to encoder.
+            #
             if iteration % update_interval == 0:
+                print('终止条件 iteration % update_interval == 0')
+                print('iteration is {} update_interval is {}'.format(iteration, update_interval))
+
                 self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
                 self.p = self.p_mat(self.q)
 
                 y_pred = self.q.argmax(1)
                 delta_label = ((y_pred == self.y_pred).sum().astype(np.float32) / y_pred.shape[0])
+
+                # y用来计算准确率的
                 if y is not None:
                     acc = self.cluster_acc(y, y_pred)[0]
                     self.accuracy.append(acc)
