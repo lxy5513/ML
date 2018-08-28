@@ -119,6 +119,7 @@ class DeepEmbeddingClustering(object):
         dropout_fraction = 0.2
         init_stddev = 0.01
 
+        # 分层自动编码 收集每个autoencoding层  共有len(encoding_dims)层
         self.layer_wise_autoencoders = []
         self.encoders = []
         self.decoders = []
@@ -175,7 +176,7 @@ class DeepEmbeddingClustering(object):
             layerwise_epochs = max(int(layerwise_pretrain_iters / iters_per_epoch), 1)
             finetune_epochs = max(int(finetune_iters / iters_per_epoch), 1)
 
-            print('layerwise pretrain')
+            print('前-训练 分层 layerwise pretrain')
             current_input = X
             lr_epoch_update = max(1, self.iters_lr_update / float(iters_per_epoch))
 
@@ -184,6 +185,8 @@ class DeepEmbeddingClustering(object):
                 factor = int(epoch / lr_epoch_update)
                 lr = initial_rate / (10 ** factor)
                 return lr
+            # 作为回调函数的一员,LearningRateScheduler 可以按照epoch的次数自动调整学习率
+            # returns a new learning rate as output (float)
             lr_schedule = LearningRateScheduler(step_decay)
 
             for i, autoencoder in enumerate(self.layer_wise_autoencoders):
@@ -247,7 +250,8 @@ class DeepEmbeddingClustering(object):
 
     def cluster(self, X, y=None,
                 tol=0.01, update_interval=None,
-                iter_max=1e6,
+                # 设置最大的迭代训练次数
+                iter_max=1e4,
                 save_interval=None,
                 **kwargs):
 
@@ -277,7 +281,7 @@ class DeepEmbeddingClustering(object):
             # update (or initialize) probability distributions and propagate weight changes
             # from DEC model to encoder.
             if iteration % update_interval == 0:
-                self.q = self.DEC.predict(X, verbose=0)
+                self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
                 self.p = self.p_mat(self.q)
 
                 y_pred = self.q.argmax(1)
@@ -289,6 +293,7 @@ class DeepEmbeddingClustering(object):
                 else:
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
 
+                # 循环终止条件！
                 if delta_label < tol:
                     print('Reached tolerance threshold. Stopping training.')
                     train = False

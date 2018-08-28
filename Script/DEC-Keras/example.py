@@ -1,6 +1,8 @@
 from keras_dec import DeepEmbeddingClustering
 from keras.datasets import mnist
 import numpy as np
+import pdb
+import tensorflow as tf
 
 
 def get_mnist():
