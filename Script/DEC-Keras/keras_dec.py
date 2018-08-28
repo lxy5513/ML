@@ -237,6 +237,7 @@ class DeepEmbeddingClustering(object):
             self.autoencoder.fit(X, X, batch_size=self.batch_size, epochs=finetune_epochs, callbacks=[lr_schedule])
 
             if save_autoencoder:
+                print('\n\nautoencoder.save_weights(autoencoder.h5)\n\n')
                 self.autoencoder.save_weights('autoencoder.h5')
         else:
             print('Loading pretrained weights for autoencoder.')
@@ -248,7 +249,7 @@ class DeepEmbeddingClustering(object):
             self.encoder.layers[i].set_weights(self.autoencoder.layers[i].get_weights())
 
         # initialize cluster centres using k-means
-        print('Initializing cluster centres with k-means.')
+        print('\n\nInitializing cluster centres with k-means.\n\n')
         if self.cluster_centres is None:
             kmeans = KMeans(n_clusters=self.n_clusters, n_init=20)
             self.y_pred = kmeans.fit_predict(self.encoder.predict(X))
@@ -279,8 +280,10 @@ class DeepEmbeddingClustering(object):
 
     def cluster(self, X, y=None,
                 tol=0.01, update_interval=None,
+
+
                 # 设置最大的迭代训练次数
-                iter_max=1e4,
+                iter_max=1e6,
                 save_interval=None,
                 **kwargs):
 
@@ -337,7 +340,7 @@ class DeepEmbeddingClustering(object):
                 self.cluster_centres = self.DEC.layers[-1].get_weights()[0]
 
             # train on batch
-            sys.stdout.write('Iteration %d, ' % iteration)
+            sys.stdout.write('迭代次数 Iteration %d, ' % iteration)
             if (index+1)*self.batch_size > X.shape[0]:
                 loss = self.DEC.train_on_batch(X[index*self.batch_size::], self.p[index*self.batch_size::])
                 index = 0
