@@ -193,13 +193,17 @@ class DeepEmbeddingClustering(object):
             iters_per_epoch = int(len(X) / self.batch_size)
             layerwise_epochs = max(int(layerwise_pretrain_iters / iters_per_epoch), 1)
 
-            # too long !!!
+            # too long !!!--------------------------------1
             layerwise_epochs = 18
 
             finetune_epochs = max(int(finetune_iters / iters_per_epoch), 1)
 
+            # too long !!!--------------------------------2
+            finetune_epochs = 36
+
             print('前-训练 分层 layerwise pretrain')
             current_input = X
+            print('\n current_input ', current_input)
             lr_epoch_update = max(1, self.iters_lr_update / float(iters_per_epoch))
 
             def step_decay(epoch):
@@ -228,7 +232,7 @@ class DeepEmbeddingClustering(object):
                     current_input = encoder_model.predict(current_input)
 
                 autoencoder.fit(current_input, current_input,
-                                batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule])
+                                batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule], verbose=2)
                 self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
                 self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
 
@@ -238,8 +242,9 @@ class DeepEmbeddingClustering(object):
 
 
 
-            #update encoder and decoder weights:
-            self.autoencoder.fit(X, X, batch_size=self.batch_size, epochs=finetune_epochs, callbacks=[lr_schedule])
+            #update encoder and decoder weights: ------------------------------------
+            print('update encoder and decoder weights')
+            self.autoencoder.fit(X, X, batch_size=self.batch_size, epochs=finetune_epochs, callbacks=[lr_schedule], verbose=2)
 
             if save_autoencoder:
                 print('\n\nautoencoder.save_weights(autoencoder.h5)\n\n')
