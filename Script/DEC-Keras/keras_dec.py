@@ -193,13 +193,13 @@ class DeepEmbeddingClustering(object):
             iters_per_epoch = int(len(X) / self.batch_size)
             layerwise_epochs = max(int(layerwise_pretrain_iters / iters_per_epoch), 1)
 
-            # too long !!!--------------------------------1
+            # too long !!!----------------------------------------------------------1
             layerwise_epochs = 18
 
             finetune_epochs = max(int(finetune_iters / iters_per_epoch), 1)
 
-            # too long !!!--------------------------------2
-            finetune_epochs = 36
+            # too long !!!----------------------------------------------------------2
+            finetune_epochs = 18
 
             print('前-训练 分层 layerwise pretrain')
             current_input = X
@@ -260,12 +260,16 @@ class DeepEmbeddingClustering(object):
 
         # initialize cluster centres using k-means
         print('\n\nInitializing cluster centres with k-means.\n')
+        print('有没有给cluster_center ?')
         if self.cluster_centres is None:
+            print('No')
             kmeans = KMeans(n_clusters=self.n_clusters, n_init=20)
             self.y_pred = kmeans.fit_predict(self.encoder.predict(X))
             self.cluster_centres = kmeans.cluster_centers_
+        else:
+            print('Yes')
 
-        print('分成的类数： ', self.cluster_centres)
+        print('分成的类数： ', self.cluster_centres, '\n', self.cluster_centres.shape)
         # prepare DEC model
         #self.DEC = Model(inputs=self.input_layer,
         #                 outputs=ClusteringLayer(self.n_clusters,
@@ -290,8 +294,9 @@ class DeepEmbeddingClustering(object):
 
 
     def cluster(self, X, y=None,
-                tol=0.01, update_interval=None,
-
+                # 什么意思
+                tol=0.01,
+                update_interval=None,
 
                 # 设置最大的迭代训练次数
                 iter_max=1e6,
@@ -331,7 +336,14 @@ class DeepEmbeddingClustering(object):
                 self.q = self.DEC.predict(X, verbose=0)                  # 预测！！
                 self.p = self.p_mat(self.q)
 
+                # 什么东西
                 y_pred = self.q.argmax(1)
+                # 什么东西
+
+                # --------------------------3
+                print('y_pred and self.y_pred', y_pred, '\n\n', self.y_pred)
+                time.sleep(2)
+
                 delta_label = ((y_pred == self.y_pred).sum().astype(np.float32) / y_pred.shape[0])
 
                 # y用来计算准确率的
@@ -343,8 +355,8 @@ class DeepEmbeddingClustering(object):
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
 
                 # 循环终止条件！
-                print('循环终止条件=====================delta_label < tol')
-                print('delta_label is     {} tol is                {}'.format(delta_label, tol))
+                print('循环终止条件==========     delta_label < tol')
+                print('delta_label is     {} \ntol is                {}'.format(delta_label, tol))
                 if delta_label < tol:
                     print('Reached tolerance threshold. Stopping training.')
                     train = False
