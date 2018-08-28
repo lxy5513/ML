@@ -206,7 +206,12 @@ class DeepEmbeddingClustering(object):
             # returns a new learning rate as output (float)
             lr_schedule = LearningRateScheduler(step_decay)
 
+
+
+
             for i, autoencoder in enumerate(self.layer_wise_autoencoders):
+                print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
+                time.sleep(1)
                 if i > 0:
                     weights = self.encoders[i-1].get_weights()
                     dense_layer = Dense(self.encoders_dims[i], input_shape=(current_input.shape[1],),
@@ -222,7 +227,10 @@ class DeepEmbeddingClustering(object):
                 self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
 
             consume_time()
-            print('Finetuning autoencoder')
+            print('微调自动编码 Finetuning autoencoder')
+
+
+
 
             #update encoder and decoder weights:
             self.autoencoder.fit(X, X, batch_size=self.batch_size, epochs=finetune_epochs, callbacks=[lr_schedule])
@@ -291,6 +299,8 @@ class DeepEmbeddingClustering(object):
         iteration, index = 0, 0
         self.accuracy = []
 
+        print('开始训练')
+        consume_time()
         while train:
             sys.stdout.write('\r')
             # cutoff iteration
@@ -351,4 +361,7 @@ class DeepEmbeddingClustering(object):
 
             iteration += 1
             sys.stdout.flush()
+        print('训练完成')
+        consume_time()
         return
+
