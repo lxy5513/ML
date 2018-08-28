@@ -20,7 +20,7 @@ from sklearn.decomposition import PCA
 import time
 
 
-start_time = 0
+start_time = time.time()
 def consume_time():
     end_time = time.time()
     interval = end_time - start_time
@@ -210,6 +210,7 @@ class DeepEmbeddingClustering(object):
 
 
             for i, autoencoder in enumerate(self.layer_wise_autoencoders):
+                consume_time()
                 print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
                 time.sleep(1)
                 if i > 0:
