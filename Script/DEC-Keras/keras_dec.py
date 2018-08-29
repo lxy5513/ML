@@ -13,10 +13,10 @@ from keras.layers import Dense, Dropout, Input
 from keras.optimizers import SGD
 from sklearn.preprocessing import normalize
 from keras.callbacks import LearningRateScheduler
+# 匈牙利算法 输入代价矩阵 返回寻找的成本最小化分配。
 from sklearn.utils.linear_assignment_ import linear_assignment
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-
 import time
 
 
@@ -282,10 +282,12 @@ class DeepEmbeddingClustering(object):
         self.DEC.compile(loss='kullback_leibler_divergence', optimizer='adadelta')
         return
 
-
+    # 准确率的判定----------------------------
     def cluster_acc(self, y_true, y_pred):
         assert y_pred.size == y_true.size
+        # why?
         D = max(y_pred.max(), y_true.max())+1
+        # weight
         w = np.zeros((D, D), dtype=np.int64)
         for i in range(y_pred.size):
             w[y_pred[i], y_true[i]] += 1
@@ -349,8 +351,7 @@ class DeepEmbeddingClustering(object):
 
 
 
-
-                # y用来计算准确率的
+                # y用来计算准确率的=================================================================
                 if y is not None:
                     acc = self.cluster_acc(y, y_pred)[0]
                     import pdb; pdb.set_trace()
