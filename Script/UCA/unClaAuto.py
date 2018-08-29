@@ -85,7 +85,7 @@ decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
 autoencoder = Model(input_img, decoded)
 
 try:
-    model = multi_gpu_model(model, cpu_merge=False)
+    autoencoder = multi_gpu_model(autoencoder, cpu_merge=False)
     print("Training using multiple GPUs..")
 except:
     print("Training using single GPU or CPU..")
@@ -197,7 +197,7 @@ autoencoder = Model(inputs, act_9)
 
 
 try:
-    model = multi_gpu_model(model, cpu_merge=False)
+    autoencoder = multi_gpu_model(autoencoder, cpu_merge=False)
     print("Training using multiple GPUs..")
 except:
     print("Training using single GPU or CPU..")
