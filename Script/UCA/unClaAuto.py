@@ -30,6 +30,8 @@ def get_dataset():
 
 X, X_test, Y, Y_test, X_train_noisy, X_test_noisy = get_dataset()
 
+import time
+time.sleep(2)
 
 # About Dataset:
 print('Training shape:', X.shape)
@@ -37,7 +39,7 @@ print(X.shape[0], 'sample,',X.shape[1] ,'x',X.shape[2] ,'size grayscale image.\n
 print('Test shape:', X_test.shape)
 print(X_test.shape[0], 'sample,',X_test.shape[1] ,'x',X_test.shape[2] ,'size grayscale image.\n')
 
-print('Examples:')
+print('\n\nExamples:')
 n = 10
 plt.figure(figsize=(20, 4))
 for i in range(1, n):
