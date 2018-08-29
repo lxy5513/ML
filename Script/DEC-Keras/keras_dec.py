@@ -303,6 +303,7 @@ class DeepEmbeddingClustering(object):
                 save_interval=None,
                 **kwargs):
 
+        # 真不知道是什么
         if update_interval is None:
             # 1 epochs
             update_interval = X.shape[0]/self.batch_size
@@ -330,15 +331,15 @@ class DeepEmbeddingClustering(object):
 
             # update (or initialize) probability distributions and propagate weight changes
             # from DEC model to encoder.
-            # 输出条件
+            # 输出条件 ------------------------------------------------------ 4
             if iteration/3 % update_interval == 0:
 
-                self.q = self.DEC.predict(X, verbose=0)                  #=================== 预测！！
+                self.q = self.DEC.predict(X, verbose=0)                  # =================== 预测！！
                 self.p = self.p_mat(self.q)
 
-                # 什么东西   ===============预测数据 分10类
+                # 什么东西   =============== 预测数据 分10类
                 y_pred = self.q.argmax(1)
-                # 什么东西
+
 
                 # --------------------------3
                 print('y_pred and self.y_pred:\n', y_pred, '\n', self.y_pred)
@@ -346,19 +347,25 @@ class DeepEmbeddingClustering(object):
 
                 delta_label = ((y_pred == self.y_pred).sum().astype(np.float32) / y_pred.shape[0])
 
+
+
+
                 # y用来计算准确率的
                 if y is not None:
                     acc = self.cluster_acc(y, y_pred)[0]
+                    import pdb; pdb.set_trace()
                     self.accuracy.append(acc)
                     print('Iteration '+str(iteration)+', Accuracy '+str(np.round(acc, 5)))
                 else:
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
 
+
+
                 # 循环终止条件！
                 print('循环终止条件  ==========     delta_label < tol')
                 print('delta_label is     {} \ntol is                {}'.format(delta_label, tol))
                 # -------------------------------------------------------------------------------------
-                import pdb;pdb.set_trace()
+                # import pdb;pdb.set_trace()
                 if delta_label < tol:
                     print('达到容差阈值。 停止训练 Reached tolerance threshold. Stopping training.')
                     train = False
@@ -396,6 +403,8 @@ class DeepEmbeddingClustering(object):
 
             iteration += 1
             sys.stdout.flush()
+
+
         print('训练完成')
         consume_time()
         return
