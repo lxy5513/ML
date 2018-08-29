@@ -2,3 +2,5 @@
 .vscode/
 *pyc
 test/
+*h5
+*pkl
