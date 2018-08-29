@@ -131,18 +131,20 @@ class DeepEmbeddingClustering(object):
         # greedy layer-wise training before end-to-end training:
 
         print('\n\ninput_dim is ', self.input_dim)
+
+        # fuction ---？
         self.encoders_dims = [self.input_dim, 500, 500, 2000, 10]
 
         self.input_layer = Input(shape=(self.input_dim,), name='input')
         dropout_fraction = 0.2
         init_stddev = 0.01
 
-        # 分层自动编码 收集每个autoencoding层  共有len(encoding_dims)层
+        # 分层自动编码 收集每个autoencoding层  共有len(encoding_dims)层   append 5 NN layers
         self.layer_wise_autoencoders = []
         self.encoders = []
         self.decoders = []
         for i  in range(1, len(self.encoders_dims)):
-
+            # 倒数第二层用线性激活函数 why?
             encoder_activation = 'linear' if i == (len(self.encoders_dims) - 1) else 'relu'
             encoder = Dense(self.encoders_dims[i], activation=encoder_activation,
                             input_shape=(self.encoders_dims[i-1],),
