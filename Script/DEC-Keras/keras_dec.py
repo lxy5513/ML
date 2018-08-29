@@ -222,25 +222,23 @@ class DeepEmbeddingClustering(object):
 
 
                 #--------------------------------------------------------------5
-                for d in ['/device:GPU:0', '/device:GPU:1']:
-                    with tf.device(d):
 
-                        consume_time()
-                        print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
-                        time.sleep(1)
-                        if i > 0:
-                            weights = self.encoders[i-1].get_weights()
-                            dense_layer = Dense(self.encoders_dims[i], input_shape=(current_input.shape[1],),
-                                                activation='relu', weights=weights,
-                                                name='encoder_dense_copy_%d'%i)
-                            encoder_model = Sequential([dense_layer])
-                            encoder_model.compile(loss='mse', optimizer=SGD(lr=self.learning_rate, decay=0, momentum=0.9))
-                            current_input = encoder_model.predict(current_input)
+                consume_time()
+                print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
+                time.sleep(1)
+                if i > 0:
+                    weights = self.encoders[i-1].get_weights()
+                    dense_layer = Dense(self.encoders_dims[i], input_shape=(current_input.shape[1],),
+                                        activation='relu', weights=weights,
+                                        name='encoder_dense_copy_%d'%i)
+                    encoder_model = Sequential([dense_layer])
+                    encoder_model.compile(loss='mse', optimizer=SGD(lr=self.learning_rate, decay=0, momentum=0.9))
+                    current_input = encoder_model.predict(current_input)
 
-                        autoencoder.fit(current_input, current_input,
-                                        batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule], verbose=2)
-                        self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
-                        self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
+                autoencoder.fit(current_input, current_input,
+                                batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule], verbose=2)
+                self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
+                self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
 
 
 
