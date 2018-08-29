@@ -18,7 +18,7 @@ from sklearn.utils.linear_assignment_ import linear_assignment
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import time
-
+import tensorflow as tf
 
 start_time = time.time()
 def consume_time():
@@ -219,22 +219,30 @@ class DeepEmbeddingClustering(object):
 
 
             for i, autoencoder in enumerate(self.layer_wise_autoencoders):
-                consume_time()
-                print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
-                time.sleep(1)
-                if i > 0:
-                    weights = self.encoders[i-1].get_weights()
-                    dense_layer = Dense(self.encoders_dims[i], input_shape=(current_input.shape[1],),
-                                        activation='relu', weights=weights,
-                                        name='encoder_dense_copy_%d'%i)
-                    encoder_model = Sequential([dense_layer])
-                    encoder_model.compile(loss='mse', optimizer=SGD(lr=self.learning_rate, decay=0, momentum=0.9))
-                    current_input = encoder_model.predict(current_input)
 
-                autoencoder.fit(current_input, current_input,
-                                batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule], verbose=2)
-                self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
-                self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
+
+                #--------------------------------------------------------------5
+                for d in ['/device:GPU:2', '/device:GPU:3']:
+                    with tf.device(d):
+
+                        consume_time()
+                        print('循环次数: ', i ,'/', len(self.layer_wise_autoencoders))
+                        time.sleep(1)
+                        if i > 0:
+                            weights = self.encoders[i-1].get_weights()
+                            dense_layer = Dense(self.encoders_dims[i], input_shape=(current_input.shape[1],),
+                                                activation='relu', weights=weights,
+                                                name='encoder_dense_copy_%d'%i)
+                            encoder_model = Sequential([dense_layer])
+                            encoder_model.compile(loss='mse', optimizer=SGD(lr=self.learning_rate, decay=0, momentum=0.9))
+                            current_input = encoder_model.predict(current_input)
+
+                        autoencoder.fit(current_input, current_input,
+                                        batch_size=self.batch_size, epochs=layerwise_epochs, callbacks=[lr_schedule], verbose=2)
+                        self.autoencoder.layers[i].set_weights(autoencoder.layers[1].get_weights())
+                        self.autoencoder.layers[len(self.autoencoder.layers) - i - 1].set_weights(autoencoder.layers[-1].get_weights())
+
+
 
             consume_time()
             print('微调自动编码 Finetuning autoencoder')
@@ -269,7 +277,7 @@ class DeepEmbeddingClustering(object):
         else:
             print('Yes')
 
-        print('分成的类数： ', self.cluster_centres, '\n', self.cluster_centres.shape)
+        print('分成的类数的中心位置： ', self.cluster_centres, '\n', self.cluster_centres.shape)
         # prepare DEC model
         #self.DEC = Model(inputs=self.input_layer,
         #                 outputs=ClusteringLayer(self.n_clusters,
@@ -335,6 +343,7 @@ class DeepEmbeddingClustering(object):
             # from DEC model to encoder.
             # 输出条件 ------------------------------------------------------ 4
             if iteration/3 % update_interval == 0:
+                consume_time()
 
                 self.q = self.DEC.predict(X, verbose=0)                  # =================== 预测！！
                 self.p = self.p_mat(self.q)
