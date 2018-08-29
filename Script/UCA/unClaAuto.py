@@ -1,8 +1,10 @@
 import keras
 import numpy as np
 from keras.datasets import mnist
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
-
+from keras.utils import multi_gpu_model
 
 
 epochs = 3
@@ -78,9 +80,17 @@ x = UpSampling2D((2, 2))(x)
 decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
 # Output Shape: 28x28x1
 
-autoencoder = Model(input_img, decoded)
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
+# 这个模型是用来把以上的多个神经网络层集合在一起的
+autoencoder = Model(input_img, decoded)
+
+try:
+    model = multi_gpu_model(model, cpu_merge=False)
+    print("Training using multiple GPUs..")
+except:
+    print("Training using single GPU or CPU..")
+
+autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.summary()
 
 # Checkpoints:
@@ -184,6 +194,14 @@ act_9 = Activation('sigmoid')(conv_3)
 # Output Shape: 28x28x1
 
 autoencoder = Model(inputs, act_9)
+
+
+try:
+    model = multi_gpu_model(model, cpu_merge=False)
+    print("Training using multiple GPUs..")
+except:
+    print("Training using single GPU or CPU..")
+
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
 autoencoder.summary()
