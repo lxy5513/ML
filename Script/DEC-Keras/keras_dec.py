@@ -222,7 +222,7 @@ class DeepEmbeddingClustering(object):
 
 
                 #--------------------------------------------------------------5
-                for d in ['/device:GPU:2', '/device:GPU:3']:
+                for d in ['/device:GPU:0', '/device:GPU:1']:
                     with tf.device(d):
 
                         consume_time()
@@ -246,8 +246,6 @@ class DeepEmbeddingClustering(object):
 
             consume_time()
             print('微调自动编码 Finetuning autoencoder')
-
-
 
 
             #update encoder and decoder weights: ------------------------------------
