@@ -354,12 +354,11 @@ class DeepEmbeddingClustering(object):
                 # y用来计算准确率的=================================================================
                 if y is not None:
                     acc = self.cluster_acc(y, y_pred)[0]
-                    import pdb; pdb.set_trace()
+                    # import pdb; pdb.set_trace()
                     self.accuracy.append(acc)
                     print('Iteration '+str(iteration)+', Accuracy '+str(np.round(acc, 5)))
                 else:
                     print(str(np.round(delta_label*100, 5))+'% change in label assignment')
-
 
 
                 # 循环终止条件！
@@ -392,6 +391,7 @@ class DeepEmbeddingClustering(object):
 
             # save intermediate
             if iteration % save_interval == 0:
+                print('iteration % save_interval == 0')
                 z = self.encoder.predict(X)
                 pca = PCA(n_components=2).fit(z)
                 z_2d = pca.transform(z)
@@ -400,9 +400,10 @@ class DeepEmbeddingClustering(object):
                 pickle.dump({'z_2d': z_2d, 'clust_2d': clust_2d, 'q': self.q, 'p': self.p},
                             open('c'+str(iteration)+'.pkl', 'wb'))
                 # save DEC model checkpoints======================
-                self.DEC.save('DEC_model_'+str(iteration)+'.h5')
+                self.DEC.save('DEC_model_'+str(iteration)+'_.h5')
 
             iteration += 1
+            # 好设计---
             sys.stdout.flush()
 
 
