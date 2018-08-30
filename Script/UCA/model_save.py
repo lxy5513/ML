@@ -124,7 +124,7 @@ autoencoder.summary()
 
 # define the checkpoint
 from keras.callbacks import ModelCheckpoint
-filepath="model.h5"
+filepath="model-{epoch:02d}-{loss:.4f}.h5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='auto')
 callbacks_list = [checkpoint]
 
