@@ -130,6 +130,7 @@ callbacks_list = [checkpoint]
 # Training Model:
 epochs = 5
 batch_size = 256
+# validation_data be used to avoiding overfit enhance rebust
 autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=callbacks_list)
 
 decoded_imgs = autoencoder.predict(X_test)

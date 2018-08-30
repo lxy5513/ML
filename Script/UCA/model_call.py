@@ -117,11 +117,13 @@ except:
     print("Training using single GPU or CPU..")
 
 
-filename="model-01-0.2562.hdf5"
-autoencoder.load_weights(filename)
-
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.summary()
+
+
+from keras.models import load_model
+filename="model-01-0.2562.hdf5"
+autoencoder = load_model(filename)
 
 
 
