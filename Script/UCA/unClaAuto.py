@@ -98,6 +98,7 @@ act_7 = Activation('relu')(deconv_1)
 upsample_2 = UpSampling2D((2, 2))(act_7)
 # shape=(?, 28, 28, 64)
 
+# 该层是转置的卷积操作（反卷积） 对一个普通的卷积结果做反方向的变换
 deconv_2 = Conv2DTranspose(32, (3, 3), strides=(1, 1))(upsample_2)
 act_8 = Activation('relu')(deconv_2)
 # shape=(?, ?, ?, 32)
@@ -140,7 +141,7 @@ checkpoints = []
 
 # Training Model:
 epochs = 20
-batch_size = 100
+batch_size = 256
 autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=checkpoints)
 
 decoded_imgs = autoencoder.predict(X_test)
