@@ -170,7 +170,7 @@ print("Saved model to disk")
 
 # -------------- load the saved model --------------
 from keras.models import model_from_json
-from tensorflow import tf
+import tensorflow as tf
 # load json and create model
 json_file = open('model.json', 'r')
 loaded_model_json = json_file.read()
