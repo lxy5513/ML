@@ -122,6 +122,7 @@ except:
     print("Training using single GPU or CPU..")
     parallel_model = autoencoder
 
+parallel_model.compile(optimizer='adadelta', loss='binary_crossentropy')
 
 class MyCbk(keras.callbacks.Callback):
 
