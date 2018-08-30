@@ -110,17 +110,28 @@ act_9 = Activation('sigmoid')(conv_3)
 autoencoder = Model(inputs, act_9)
 
 
-try:
-
-    autoencoder = multi_gpu_model(autoencoder, gpus=2)
-    print("Training using multiple GPUs..")
-except:
-    print("Training using single GPU or CPU..")
-
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.summary()
 
 
+try:
+
+    parallel_model = multi_gpu_model(autoencoder, gpus=2)
+    print("Training using multiple GPUs..")
+except:
+    print("Training using single GPU or CPU..")
+    parallel_model = autoencoder
+
+
+class MyCbk(keras.callbacks.Callback):
+
+    def __init__(self, model):
+         self.model_to_save = model
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.model_to_save.save('model_at_epoch_%d.h5' % epoch)
+
+cbk = MyCbk(autoencoder)
 
 # define the checkpoint
 from keras.callbacks import ModelCheckpoint
@@ -133,9 +144,9 @@ callbacks_list = [checkpoint]
 epochs = 2
 batch_size = 256
 # validation_data be used to avoiding overfit enhance rebust
-autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True)
+parallel_model.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=[cbk])
 
-decoded_imgs = autoencoder.predict(X_test)
+decoded_imgs = parallel_model.predict(X_test)
 
 n = 10
 plt.figure(figsize=(20, 4))
@@ -153,32 +164,6 @@ for i in range(1, n):
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-
-
-
-
-# ------------ save the template model rather than the gpu_mode ----------------
-# serialize model to JSON
-model_json = autoencoder.to_json()
-with open("model.json", "w") as json_file:
-    json_file.write(model_json)
-# serialize weights to HDF5
-autoencoder.save_weights("model.h5")
-print("Saved model to disk")
-
-
-
-# -------------- load the saved model --------------
-from keras.models import model_from_json
-import tensorflow as tf
-# load json and create model
-json_file = open('model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json, {'tf': tf})
-# load weights into new model
-loaded_model.load_weights("model.h5")
-print("Loaded model from disk")
 
 
 
