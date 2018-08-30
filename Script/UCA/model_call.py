@@ -117,26 +117,24 @@ except:
     print("Training using single GPU or CPU..")
 
 
+filename="model-01-0.2562.hdf5"
+autoencoder.load_weights(filename)
+
+autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+autoencoder.summary()
+
 
 
 # define the checkpoint
 from keras.callbacks import ModelCheckpoint
-filepath="model-01-0.2562.hdf5"
+filepath="model-{epoch:02d}-{loss:.4f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint]
 
 # Training Model:
 epochs = 5
 batch_size = 256
-# autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=callbacks_list)
-
-autoencoder.load_weights(filepath)
-
-
-
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-autoencoder.summary()
-
+autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=callbacks_list)
 
 decoded_imgs = autoencoder.predict(X_test)
 
