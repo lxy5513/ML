@@ -16,8 +16,10 @@ from keras import backend as K
 
 # Custom classifier function:
 def classifier_func(x):
+    # x.shape=(?,10) K.argmax(x, axis=1)---return:(?,)
+    # one_hot 输入为n维的整数向量 输出为(n+1)维的独热码   one_hot 将一个值化为一个概率分布的向量
     return x+x*K.one_hot(K.argmax(x, axis=1), num_classes=num_class)
-
+    # return shape=(?,10)
 
 
 # Getting Dataset:
@@ -45,7 +47,7 @@ X, X_test, Y, Y_test, X_train_noisy, X_test_noisy = get_dataset()
 # Deep Learning Model:
 inputs = Input(shape=(28, 28, 1))
 #Encoder:
-conv_1 = Conv2D(32, (3,3), strides=(1,1))(inputs)
+conv_1 = Conv2D(32, (3,3), strides=(1, 1))(inputs)
 act_1 = Activation('relu')(conv_1)
 maxpool_1 = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(act_1)
 
@@ -54,32 +56,51 @@ act_2 = Activation('relu')(conv_2)
 maxpool_2 = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(act_2)
 # Output Shape: 6x6x64
 
+# 把多维数据一维化 常用于从卷积层到全连接层的过渡 out_put.shape=(6,256)
 flat_1 = Flatten()(maxpool_2)
+# Dense 全连接层
 fc_1 = Dense(256)(flat_1)
 act_3 = Activation('relu')(fc_1)
 
 fc_2 = Dense(128)(act_3)
 act_4 = Activation('relu')(fc_2)
 
+# fc_3 return shape=(?,10)
 fc_3 = Dense(num_class)(act_4)
-act_class = Lambda(classifier_func, output_shape=(num_class,))(fc_3)
-# Output Shape: 10
 
-#Decoder:
+# Lambda 用以对上一层输出施以任何Tensorflow表达式
+# function 要实现的函数，该函数仅接受一个变量 即上一层的输出
+# output_shape 返回应该返回的值的shape
+act_class = Lambda(classifier_func, output_shape=(num_class,))(fc_3)
+# Output Shape: (?,10)
+
+# -------------Decoder:
+# 256: 隐藏层的节点数 即输出层的shape[-1]
 fc_4 = Dense(256)(act_class)
 act_5 = Activation('relu')(fc_4)
+# shape=(?,256)
 
 fc_5 = Dense(2304)(act_5)
 act_6 = Activation('relu')(fc_5)
-reshape_1 = Reshape((6,6,64))(act_6)
+# shape=(?, 2304)
+
+# Reshape 将输入的shape转为特定的shape
+reshape_1 = Reshape((6, 6, 64))(act_6)
 
 upsample_1 = UpSampling2D((2, 2))(reshape_1)
+# shape = (?, 12, 12, 64)
+
 deconv_1 = Conv2DTranspose(64, (3, 3), strides=(1, 1))(upsample_1)
+# shape=(?, ?, ?, 64)
+
 act_7 = Activation('relu')(deconv_1)
 
 upsample_2 = UpSampling2D((2, 2))(act_7)
+# shape=(?, 28, 28, 64)
+
 deconv_2 = Conv2DTranspose(32, (3, 3), strides=(1, 1))(upsample_2)
 act_8 = Activation('relu')(deconv_2)
+# shape=(?, ?, ?, 32)
 
 conv_3 = Conv2D(1, (3, 3), strides=(1, 1))(act_8)
 act_9 = Activation('sigmoid')(conv_3)
