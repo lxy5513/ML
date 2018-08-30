@@ -123,6 +123,7 @@ autoencoder.summary()
 
 from keras.models import load_model
 filename="model.h5"
+autoencoder.save_model(filename)
 autoencoder = load_model(filename)
 
 
