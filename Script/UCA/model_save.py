@@ -129,14 +129,11 @@ checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only
 callbacks_list = [checkpoint]
 
 
-# 换一种方法保存
-callbacks_list = []
-
 # Training Model:
 epochs = 5
 batch_size = 256
 # validation_data be used to avoiding overfit enhance rebust
-autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=callbacks_list)
+autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True)
 
 decoded_imgs = autoencoder.predict(X_test)
 
@@ -187,7 +184,7 @@ print("Loaded model from disk")
 
 
 
-
+num_class = 10
 
 # Split autoencoder:
 encoder = Model(inputs, act_class)
