@@ -130,7 +130,7 @@ callbacks_list = [checkpoint]
 
 
 # Training Model:
-epochs = 5
+epochs = 2
 batch_size = 256
 # validation_data be used to avoiding overfit enhance rebust
 autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True)
@@ -170,21 +170,17 @@ print("Saved model to disk")
 
 # -------------- load the saved model --------------
 from keras.models import model_from_json
-
+from tensorflow import tf
 # load json and create model
 json_file = open('model.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
-loaded_model = model_from_json(loaded_model_json)
+loaded_model = model_from_json(loaded_model_json, {'tf': tf})
 # load weights into new model
 loaded_model.load_weights("model.h5")
 print("Loaded model from disk")
 
 
-
-
-
-num_class = 10
 
 # Split autoencoder:
 encoder = Model(inputs, act_class)
