@@ -122,10 +122,11 @@ autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.summary()
 
 
-from keras.models import load_model
+'''
 filename="model-05-0.1370.h5"
 autoencoder.save_weights(filename)
 autoencoder.load_weights(filename)
+'''
 
 
 # define the checkpoint

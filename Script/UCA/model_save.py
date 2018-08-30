@@ -128,6 +128,10 @@ filepath="model-{epoch:02d}-{loss:.4f}.h5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='auto')
 callbacks_list = [checkpoint]
 
+
+# 换一种方法保存
+callbacks_list = []
+
 # Training Model:
 epochs = 5
 batch_size = 256
@@ -152,6 +156,38 @@ for i in range(1, n):
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
+
+
+
+
+# ------------ save the template model rather than the gpu_mode ----------------
+# serialize model to JSON
+model_json = autoencoder.to_json()
+with open("model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+autoencoder.save_weights("model.h5")
+print("Saved model to disk")
+
+
+
+# -------------- load the saved model --------------
+from keras.models import model_from_json
+
+# load json and create model
+json_file = open('model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+loaded_model = model_from_json(loaded_model_json)
+# load weights into new model
+loaded_model.load_weights("model.h5")
+print("Loaded model from disk")
+
+
+
+
+
+
 
 # Split autoencoder:
 encoder = Model(inputs, act_class)
@@ -179,6 +215,13 @@ for i, sample in enumerate(predicted):
 
 comparison = Y_test == predicted
 loss = 1 - np.sum(comparison.astype(int))/Y_test.shape[0]
+
+
+
+
+
+
+
 
 print('Loss:', loss)
 print('Examples:')
