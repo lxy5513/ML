@@ -80,7 +80,7 @@ fc_4 = Dense(512)(act_class)
 act_5 = Activation('relu')(fc_4)
 # shape=(?,256)
 
-fc_5 = Dense(4608)(act_5)
+fc_5 = Dense(2304)(act_5)
 act_6 = Activation('relu')(fc_5)
 # shape=(?, 2304)
 
@@ -140,7 +140,7 @@ checkpoints = []
 
 
 # Training Model:
-epochs = 20
+epochs = 40
 batch_size = 256
 autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=checkpoints)
 
@@ -193,7 +193,7 @@ loss = 1 - np.sum(comparison.astype(int))/Y_test.shape[0]
 print('Loss:', loss)
 print('Examples:')
 for i in range(10):
-    plt.imshow(X_test[i].reshape(28,28), cmap='gray')
+    plt.imshow(X_test[i].reshape(28, 28), cmap='gray')
     plt.axis('off')
     plt.show()
     neuron = np.argmax(encode[i], axis=0)
