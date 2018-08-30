@@ -12,17 +12,18 @@ batch_size = 100
 # Getting Dataset:
 def get_dataset():
     (X, Y), (X_test, Y_test) = mnist.load_data()
-
+    import pdb;pdb.set_trace()
     X = X.astype('float32') / 255.
     X_test = X_test.astype('float32') / 255.
     X = np.reshape(X, (len(X), 28, 28, 1))
     X_test = np.reshape(X_test, (len(X_test), 28, 28, 1))
 
-    # Add noise:
+    # Add noise:  是用来验证训练图片编码模块的吗
     noise_factor = 0.4
     X_train_noisy = X + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=X.shape)
     X_test_noisy = X_test + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=X_test.shape)
 
+    # numpy.clip(a, a_min, a_max, out=None) 限制最小 最大值
     X_train_noisy = np.clip(X_train_noisy, 0., 1.)
     X_test_noisy = np.clip(X_test_noisy, 0., 1.)
 
@@ -31,13 +32,13 @@ def get_dataset():
 X, X_test, Y, Y_test, X_train_noisy, X_test_noisy = get_dataset()
 
 import time
-time.sleep(2)
+time.sleep(0.1)
 
 # About Dataset:
 print('Training shape:', X.shape)
-print(X.shape[0], 'sample,',X.shape[1] ,'x',X.shape[2] ,'size grayscale image.\n')
+print(X.shape[0], 'sample,', X.shape[1], 'x', X.shape[2], 'size grayscale image.\n')
 print('Test shape:', X_test.shape)
-print(X_test.shape[0], 'sample,',X_test.shape[1] ,'x',X_test.shape[2] ,'size grayscale image.\n')
+print(X_test.shape[0], 'sample,', X_test.shape[1], 'x', X_test.shape[2], 'size grayscale image.\n')
 
 print('\n\nExamples:')
 n = 10
@@ -46,6 +47,7 @@ for i in range(1, n):
     # display original
     ax = plt.subplot(2, n, i)
     plt.imshow(X[i].reshape(28, 28))
+    plt.show()
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
@@ -53,11 +55,14 @@ for i in range(1, n):
     # display reconstruction
     ax = plt.subplot(2, n, i + n)
     plt.imshow(X_train_noisy[i].reshape(28, 28))
+    # import pdb;pdb.set_trace()
+    # 显示灰度图
     plt.gray()
+    # 设置横坐标不显示
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-
+import pdb;pdb.set_trace()
 
 # Deep Learning Model:
 from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Dense
