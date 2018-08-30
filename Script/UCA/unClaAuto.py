@@ -76,11 +76,11 @@ act_class = Lambda(classifier_func, output_shape=(num_class,))(fc_3)
 
 # -------------Decoder:
 # 256: 隐藏层的节点数 即输出层的shape[-1]
-fc_4 = Dense(256)(act_class)
+fc_4 = Dense(512)(act_class)
 act_5 = Activation('relu')(fc_4)
 # shape=(?,256)
 
-fc_5 = Dense(2304)(act_5)
+fc_5 = Dense(4608)(act_5)
 act_6 = Activation('relu')(fc_5)
 # shape=(?, 2304)
 
