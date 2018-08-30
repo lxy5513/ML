@@ -122,7 +122,7 @@ autoencoder.summary()
 
 
 from keras.models import load_model
-filename="model.h5"
+filename="model-05-0.1370.h5"
 autoencoder.save_weights(filename)
 autoencoder.load_weights(filename)
 
