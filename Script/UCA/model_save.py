@@ -111,6 +111,7 @@ autoencoder = Model(inputs, act_9)
 
 
 try:
+    sa
     autoencoder = multi_gpu_model(autoencoder, gpus=2)
     print("Training using multiple GPUs..")
 except:
