@@ -122,9 +122,8 @@ autoencoder.summary()
 
 
 from keras.models import load_model
-filename="model-01-0.2562.hdf5"
+filename="model.h5"
 autoencoder = load_model(filename)
-
 
 
 # define the checkpoint
