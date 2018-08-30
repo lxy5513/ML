@@ -2,17 +2,27 @@ import keras
 import numpy as np
 from keras.datasets import mnist
 import matplotlib
+#实现Matplotlib绘图并保存图像但不显示图形的方法 ssh 服务器
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from keras.utils import multi_gpu_model
 
+# Describe the number of classes:
+num_class = 10
 
-epochs = 3
-batch_size = 100
+from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Conv2DTranspose, Dense, Activation, Lambda, Reshape, Flatten
+from keras.models import Model
+from keras import backend as K
+
+# Custom classifier function:
+def classifier_func(x):
+    return x+x*K.one_hot(K.argmax(x, axis=1), num_classes=num_class)
+
+
+
 # Getting Dataset:
 def get_dataset():
     (X, Y), (X_test, Y_test) = mnist.load_data()
-    import pdb;pdb.set_trace()
     X = X.astype('float32') / 255.
     X_test = X_test.astype('float32') / 255.
     X = np.reshape(X, (len(X), 28, 28, 1))
@@ -31,131 +41,8 @@ def get_dataset():
 
 X, X_test, Y, Y_test, X_train_noisy, X_test_noisy = get_dataset()
 
-import time
-time.sleep(0.1)
-
-# About Dataset:
-print('Training shape:', X.shape)
-print(X.shape[0], 'sample,', X.shape[1], 'x', X.shape[2], 'size grayscale image.\n')
-print('Test shape:', X_test.shape)
-print(X_test.shape[0], 'sample,', X_test.shape[1], 'x', X_test.shape[2], 'size grayscale image.\n')
-
-print('\n\nExamples:')
-n = 10
-plt.figure(figsize=(20, 4))
-for i in range(1, n):
-    # display original
-    ax = plt.subplot(2, n, i)
-    plt.imshow(X[i].reshape(28, 28))
-    plt.show()
-    plt.gray()
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-    # display reconstruction
-    ax = plt.subplot(2, n, i + n)
-    plt.imshow(X_train_noisy[i].reshape(28, 28))
-    # import pdb;pdb.set_trace()
-    # 显示灰度图
-    plt.gray()
-    # 设置横坐标不显示
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-import pdb;pdb.set_trace()
 
 # Deep Learning Model:
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Dense
-from keras.models import Model
-
-input_img = Input(shape=(28, 28, 1))
-
-x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
-x = MaxPooling2D((2, 2), padding='same')(x)
-x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
-x = MaxPooling2D((2, 2), padding='same')(x)
-x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
-encoded = MaxPooling2D((2, 2), padding='same')(x)
-# Output Shape: 4x4x8
-
-x = Conv2D(8, (3, 3), activation='relu', padding='same')(encoded)
-x = UpSampling2D((2, 2))(x)
-x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
-x = UpSampling2D((2, 2))(x)
-x = Conv2D(16, (3, 3), activation='relu')(x)
-x = UpSampling2D((2, 2))(x)
-decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
-# Output Shape: 28x28x1
-
-
-# 这个模型是用来把以上的多个神经网络层集合在一起的
-autoencoder = Model(input_img, decoded)
-
-try:
-    autoencoder = multi_gpu_model(autoencoder, gpus=2)
-    print("Training using multiple GPUs..")
-except:
-    print("Training using single GPU or CPU..")
-
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-autoencoder.summary()
-
-# Checkpoints:
-from keras.callbacks import ModelCheckpoint, TensorBoard
-checkpoints = []
-#checkpoints.append(TensorBoard(log_dir='/Checkpoints/logs'))
-
-# Creates live data:
-# For better yield. The duration of the training is extended.
-
-from keras.preprocessing.image import ImageDataGenerator
-generated_data = ImageDataGenerator(featurewise_center=False, samplewise_center=False, featurewise_std_normalization=False, samplewise_std_normalization=False, zca_whitening=False, rotation_range=0,  width_shift_range=0.1, height_shift_range=0.1, horizontal_flip = True, vertical_flip = False)
-generated_data.fit(X_train_noisy)
-
-autoencoder.fit_generator(generated_data.flow(X_train_noisy, X, batch_size=batch_size), steps_per_epoch=X.shape[0], epochs=epochs, validation_data=(X_test_noisy, X_test), callbacks=checkpoints)
-
-
-
-
-# Training Model:
-epochs = 3
-batch_size = 100
-autoencoder.fit(X_train_noisy, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test_noisy, X_test), shuffle=True, callbacks=checkpoints)
-
-
-decoded_imgs = autoencoder.predict(X_test_noisy)
-
-n = 10
-plt.figure(figsize=(20, 4))
-for i in range(1, n):
-    # display original
-    ax = plt.subplot(2, n, i)
-    plt.imshow(X_test_noisy[i].reshape(28, 28))
-    plt.gray()
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-    # display reconstruction
-    ax = plt.subplot(2, n, i + n)
-    plt.imshow(decoded_imgs[i].reshape(28, 28))
-    plt.gray()
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-# Describe the number of classes:
-num_class = 10
-
-from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Conv2DTranspose, Dense, Activation, Lambda, Reshape, Flatten
-from keras.models import Model
-from keras import backend as K
-
-# Custom classifier function:
-def classifier_func(x):
-    return x+x*K.one_hot(K.argmax(x, axis=1), num_classes=num_class)
-
-
-# Deep Learning Model:
-
 inputs = Input(shape=(28, 28, 1))
 #Encoder:
 conv_1 = Conv2D(32, (3,3), strides=(1,1))(inputs)
@@ -213,6 +100,9 @@ autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
 autoencoder.summary()
 
+
+
+'''
 # Creates live data:
 # For better yield. The duration of the training is extended.
 
@@ -221,6 +111,14 @@ generated_data = ImageDataGenerator(featurewise_center=False, samplewise_center=
 generated_data.fit(X)
 
 autoencoder.fit_generator(generated_data.flow(X, X, batch_size=batch_size), steps_per_epoch=X.shape[0], epochs=epochs, validation_data=(X_test, X_test), callbacks=checkpoints)
+'''
+
+
+# Checkpoints:
+from keras.callbacks import ModelCheckpoint, TensorBoard
+checkpoints = []
+#checkpoints.append(TensorBoard(log_dir='/Checkpoints/logs'))
+
 
 # Training Model:
 epochs = 4
@@ -281,7 +179,4 @@ for i in range(10):
     plt.show()
     neuron = np.argmax(encode[i], axis=0)
     print('Class:', Y_test[i], '- Model\'s Output Class:', neuron_class[neuron])
-
-
-
 
