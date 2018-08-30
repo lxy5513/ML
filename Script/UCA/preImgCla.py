@@ -3,7 +3,7 @@ import numpy as np
 from keras.datasets import mnist
 import matplotlib
 #实现Matplotlib绘图并保存图像但不显示图形的方法 ssh 服务器
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from keras.utils import multi_gpu_model
 
@@ -169,4 +169,4 @@ for i in range(1, n):
 
 
 
-
+plt.show()

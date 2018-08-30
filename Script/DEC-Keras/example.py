@@ -22,11 +22,6 @@ def get_mnist():
     # (70000,)
     return X, Y
 
-for d in ['/device:GPU:0', '/device:GPU:1']:
-    with tf.device(d):
-        pass
-
-
 
 X, Y = get_mnist()
 

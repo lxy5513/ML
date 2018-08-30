@@ -55,7 +55,6 @@ maxpool_2 = MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(act_2)
 # Output Shape: 6x6x64
 
 flat_1 = Flatten()(maxpool_2)
-
 fc_1 = Dense(256)(flat_1)
 act_3 = Activation('relu')(fc_1)
 
@@ -63,7 +62,6 @@ fc_2 = Dense(128)(act_3)
 act_4 = Activation('relu')(fc_2)
 
 fc_3 = Dense(num_class)(act_4)
-
 act_class = Lambda(classifier_func, output_shape=(num_class,))(fc_3)
 # Output Shape: 10
 
@@ -97,7 +95,6 @@ except:
     print("Training using single GPU or CPU..")
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-
 autoencoder.summary()
 
 
@@ -121,7 +118,7 @@ checkpoints = []
 
 
 # Training Model:
-epochs = 4
+epochs = 20
 batch_size = 100
 autoencoder.fit(X, X, batch_size=batch_size, epochs=epochs, validation_data=(X_test, X_test), shuffle=True, callbacks=checkpoints)
 
