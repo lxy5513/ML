@@ -131,6 +131,7 @@ class MyCbk(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         self.model_to_save.save('model_at_epoch_%d.h5' % epoch)
+        # self.model_to_save.save('model_at_epoch_{}_loss_{}_.h5'.format(epoch, loss))
 
 cbk = MyCbk(autoencoder)
 

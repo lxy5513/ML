@@ -128,10 +128,15 @@ autoencoder.save_weights(filename)
 autoencoder.load_weights(filename)
 '''
 
+filename = 'model_at_epoch_1.h5'
+autoencoder.save_weights(filename)
+autoencoder.load_weights(filename)
+
+
 
 # define the checkpoint
 from keras.callbacks import ModelCheckpoint
-filepath="model-{epoch:02d}-{loss:.4f}.hdf5"
+filepath="model-{epoch:02d}-{loss:.4f}.h5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint]
 
