@@ -129,8 +129,11 @@ autoencoder.load_weights(filename)
 '''
 
 filename = 'model_at_epoch_1.h5'
-autoencoder.save_weights(filename)
-autoencoder.load_weights(filename)
+from keras.models import load_model
+autoencoder = load_model(filename)
+
+
+import pdb;pdb.set_trace()
 
 
 
